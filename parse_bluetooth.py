@@ -6,29 +6,6 @@ import itertools
 import numpy
 from collections import deque
 
-def hasNumeric(obj, field):
-   try:
-      obj[field][0][0]
-      return True
-   except:
-      return False
-
-
-def getNumeric(obj, field):
-   return obj[field][0][0]
-
-
-def hasArray(obj, field):
-   try:
-      obj[field][0]
-      return True
-   except:
-      return False
-
-
-def getArray(obj, field):
-   return obj[field][0]
-
 
 def validSubjects(allSubjects):
    return [s for s in allSubjects if hasNumeric(s,'mac') and hasNumeric(s,'my_hashedNumber')]
@@ -44,21 +21,6 @@ def idDicts(subjects):
       dict((getNumeric(s,'mac'), (i, s)) for (i,s) in enumerate(subjects)),
       dict((getNumeric(s, 'my_hashedNumber'), (i, s)) for (i,s) in enumerate(subjects)))
       
-def isEmpty(obj):
-    if len(obj)==0:
-        return True
-    return False
-      
-def countEncounters(p1, p2):
-    print "working gina's code"
-    counter=0
-    t=[]
-    for i in xrange(len(p1['device_date'][0])):
-        for j in xrange(len(p1['device_macs'][0][i])):
-            if isEmpty(p1['device_macs'][0][i][j])==False and p2['mac'][0][0]==p1['device_macs'][0][i][j][0]:
-            	t.append(convertDatetime(p1['device_date'][0][i]))
-            	counter+=1
-    return counter, t #timeArray1,t
     
 def matchBlueToothEvents(idd1, idd2):
 	mac1 = idd1['mac'][0][0]
@@ -77,30 +39,57 @@ def matchBlueToothEvents(idd1, idd2):
 					events.append(convertDatetime(idd2['device_date'][0][k]))	
 	#events = events.sort()
 	return events
+	
+def isWeekend(d):
+	if d.isoweekday()==5 or d.isoweekday()==6 or d.isoweekday()==7:
+		return True
+	else: return False
+	
+def filterByWeekend(events):
+	list =[]
+	for i in events:
+		if isWeekend(i):
+			list.append(i)
+	return list
 
 def convertDatetime(dt):
    return datetime.fromordinal(int(dt)) + timedelta(days=dt%1) - timedelta(days=366) - timedelta(hours=5)
 
+def makeGraph(events):
+	x = []
+	for i in events:
+		if i not in X:
+			x.append(i)
+	y=[]
+	count = 0
+	for k in x:
+		for j in events:
+			if k==j:
+				count = count + 1
+	y.append(count)
+	count = 0
+	#plot
+	
+def filterByTime(events,starth,endh):
+	list = []
+	for i in events:
+		if i.hour >= starh and i.hour<= endh:
+			list.append(i)
+	return list
+	
+def filterByWeekend(events):
+	list = []
+	for i in events:
+		if isWeekend(i):
+			list.append(i)
+	return list
 
-def inRange(dateRange, timevalue):
-   start, end = dateRange
-   unixTime = int(time.mktime(timevalue.timetuple()))
-   return start <= unixTime <= end
-
-
-def filterByDate(dateRange, events):
-   filteredCalls = [e for e in events if inRange(dateRange, e['date'])]
-   print("%d calls after filtering by date" % len(filteredCalls))
-   return filteredCalls
-
-
-def writeCallEvents(callEventDicts, filename):
-   with open(filename, 'w') as outfile:
-      outfile.write('subjectId\totherPartyId\tduration\tdirection\tdate\n')
-      for d in callEventDicts:
-         values = [d['subjectId'], d['otherPartyId'], d['duration'], d['direction'], d['date']]
-         line = '\t'.join(("%s" % (v,)) for v in values)
-         outfile.write('%s\n' % line)
+def isFriend(user1,user2):
+	events = filterByTime(filterByWeekend(matchBlueToothEvents(user1,user2)))
+	if events> 10:
+		return True
+	else:
+		return False
 
 # survey values are either numeric or numpy.nan, so we need special
 # functions to account for means/maxes involving nan.
@@ -109,34 +98,11 @@ def mean(x, y):
       return mean(0, y)
    if numpy.isnan(y):
       return mean(x, 0)
-
    return float(x + y) / 2
-
 
 def myMax(x, y):
    if numpy.isnan(x):
       return myMax(0, y)
    if numpy.isnan(y):
       return myMax(x, 0)
-
    return max(x,y)
-
-
-def dateIntervalOverlap(dtint1, dtint2):
-   start1, end1 = dtint1
-   start2, end2 = dtint2
-
-   if start1 <= start2 <= end1:
-      return (start2, min(end1, end2))
-   elif start2 <= start1 <= end2:
-      return (start1, min(end1, end2))
-   else:
-      return None
-
-
-if __name__ == "__main__":
-   
-
-   #createFriendshipDataset(matlab_obj['network'][0][0], idDictionaries)
-   #createPhoneCallDataset(idDictionaries)
-   createCellTowerDataset(idDictionaries)
