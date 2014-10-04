@@ -30,10 +30,8 @@ def idDicts(subjects):
       dict((getNumeric(s, 'my_hashedNumber'), (i, s)) for (i,s) in enumerate(subjects)))
 
 def matchBlueToothEvents(idd1, idd2):
-	mac1 = idd1['mac'][0][0]
 	print "Mac 1: ",mac1
 	mac2 = idd2['mac'][0][0]
-	print "Mac 2: ",mac2
 	events = []
 	for i in range(len(idd1['device_date'][0])):
 		for j in range(len(idd1['device_macs'][0][i])):
@@ -45,19 +43,13 @@ def matchBlueToothEvents(idd1, idd2):
 				if convertDatetime(idd2['device_date'][0][k]) not in events:
 					events.append(convertDatetime(idd2['device_date'][0][k]))	
 	#events = events.sort()
+	print "Matched BlueTooth Events"
 	return events
 	
 def isWeekend(d):
 	if d.isoweekday()==5 or d.isoweekday()==6 or d.isoweekday()==7:
 		return True
 	else: return False
-	
-def filterByWeekend(events):
-	list =[]
-	for i in events:
-		if isWeekend(i):
-			list.append(i)
-	return list
 
 def convertDatetime(dt):
    return datetime.fromordinal(int(dt)) + timedelta(days=dt%1) - timedelta(days=366) - timedelta(hours=5)
@@ -80,8 +72,9 @@ def makeGraph(events):
 def filterByTime(events,starth,endh):
 	list = []
 	for i in events:
-		if i.hour >= starh and i.hour<= endh:
+		if i.hour >= starth and i.hour<= endh:
 			list.append(i)
+	print "Filtered by Time"
 	return list
 	
 def filterByWeekend(events):
@@ -92,24 +85,8 @@ def filterByWeekend(events):
 	return list
 
 def isFriend(user1,user2):
-	events = filterByTime(filterByWeekend(matchBlueToothEvents(user1,user2)))
+	events = filterByTime(filterByWeekend(matchBlueToothEvents(user1,user2)),1,23)#friday 1am to saturday 11pm
 	if events> 10:
 		return True
 	else:
 		return False
-
-# survey values are either numeric or numpy.nan, so we need special
-# functions to account for means/maxes involving nan.
-def mean(x, y):
-   if numpy.isnan(x):
-      return mean(0, y)
-   if numpy.isnan(y):
-      return mean(x, 0)
-   return float(x + y) / 2
-
-def myMax(x, y):
-   if numpy.isnan(x):
-      return myMax(0, y)
-   if numpy.isnan(y):
-      return myMax(x, 0)
-   return max(x,y)
