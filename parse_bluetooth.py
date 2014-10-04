@@ -6,10 +6,18 @@ import itertools
 import numpy
 from collections import deque
 
+def hasNumeric(obj, field):
+   try:
+      obj[field][0][0]
+      return True
+   except:
+      return False
+      
+def getNumeric(obj, field):
+   return obj[field][0][0]
 
 def validSubjects(allSubjects):
    return [s for s in allSubjects if hasNumeric(s,'mac') and hasNumeric(s,'my_hashedNumber')]
-
 
 # First hash is contiguousId: subjectObject
 # second hash is macAddress: contiguousId, subjectObject
@@ -20,8 +28,7 @@ def idDicts(subjects):
    return (dict((i, s) for (i,s) in enumerate(subjects)),
       dict((getNumeric(s,'mac'), (i, s)) for (i,s) in enumerate(subjects)),
       dict((getNumeric(s, 'my_hashedNumber'), (i, s)) for (i,s) in enumerate(subjects)))
-      
-    
+
 def matchBlueToothEvents(idd1, idd2):
 	mac1 = idd1['mac'][0][0]
 	print "Mac 1: ",mac1
