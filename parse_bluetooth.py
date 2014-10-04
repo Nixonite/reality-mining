@@ -30,7 +30,7 @@ def idDicts(subjects):
       dict((getNumeric(s, 'my_hashedNumber'), (i, s)) for (i,s) in enumerate(subjects)))
 
 def matchBlueToothEvents(idd1, idd2):
-	print "Mac 1: ",mac1
+	mac1 = idd1['mac'][0][0]
 	mac2 = idd2['mac'][0][0]
 	events = []
 	for i in range(len(idd1['device_date'][0])):
