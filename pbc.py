@@ -74,30 +74,6 @@ def makeGraph(events):
 	count = 0
 	#plot
 	
-def numberOfUniqueDays(events):
-	return len({(i.day,i.month,i.year) for i in events})
-	
-def isHoliday(date):
-	if(date.month== 10 and date.day == 31):#halloween
-		return True
-	elif(date.month == 11 and (date.day == 25 or date.day == 26)):#thanksgiving and black friday
-		return True
-	elif(date.month == 12 and (date.day == 24 or date.day == 25 or date.day == 31)):#christmas eve, christmas, new year's eve
-		return True
-	elif(date.month == 1 and date.day == 1):#new year day
-		return True
-	elif(date.month == 2 and date.day == 14):#valentine's day
-		return True
-	else:
-		return False
-		
-def HolidayEvents(events):
-	hEvents = []
-	for i in events:
-		if isHoliday(i):
-			hEvents.append(i)
-	return hEvents
-	
 def filterByTime(events,starth,endh):
 	list = []
 	for i in events:
@@ -114,9 +90,7 @@ def filterByWeekend(events):
 
 def isFriend(user1,user2):
 	events = filterByTime(filterByWeekend(matchBlueToothEvents(user1,user2)),1,23)#friday 1am to saturday 11pm
-	holidayEvents = matchBlueToothEvents(user1,user2)
-	if (len(holidayEvents)>80 and numberOfUniqueDays(events)>=12 and len(events)>120):
+	if events> 3000:
 		return True
-	elif(numberOfUniqueDays(events)>=18 and len(events)>180):
-		return True
-	else: return False
+	else:
+		return False
