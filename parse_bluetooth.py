@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import time
 import sys, os
 import itertools
-import numpy
+import numpy as np
 from collections import deque
 
 def hasNumeric(obj, field):
@@ -16,7 +16,7 @@ def hasNumeric(obj, field):
 def getNumeric(obj, field):
    return obj[field][0][0]
 
-def validSubjects(allSubjects):
+def validSubjects(allSubjects):#kept as is
    return [s for s in allSubjects if hasNumeric(s,'mac') and hasNumeric(s,'my_hashedNumber')]
 
 # First hash is contiguousId: subjectObject
@@ -29,7 +29,7 @@ def idDicts(subjects):
       dict((getNumeric(s,'mac'), (i, s)) for (i,s) in enumerate(subjects)),
       dict((getNumeric(s, 'my_hashedNumber'), (i, s)) for (i,s) in enumerate(subjects)))
 
-def matchBlueToothEvents(idd1, idd2):
+def matchBlueToothEvents(idd1, idd2): #returns bluetooth matches for user1->user2 AND user2->user1
 	mac1 = idd1['mac'][0][0]
 	mac2 = idd2['mac'][0][0]
 	events = []
@@ -46,7 +46,7 @@ def matchBlueToothEvents(idd1, idd2):
 	return events
 	
 def printAllFriends(idd):
-	for i in range(1,len(idd[0])):
+	for i in range(1,len(idd[0])): #actually no need to go all the way through, only halfway since redundant
 		for j in range(1,len(idd[0])):
 			print "User:",i,"\t User:",j,"\t",isFriend(idd[0][i],idd[0][j])
 	
@@ -59,7 +59,7 @@ def isWeekend(d):
 def convertDatetime(dt):
    return datetime.fromordinal(int(dt)) + timedelta(days=dt%1) - timedelta(days=366) - timedelta(hours=5)
 
-def makeGraph(events):
+def makeGraph(events): #nevermind this is not a useful function, but it might be interesting someday
 	x = []
 	for i in events:
 		if i not in X:
@@ -91,7 +91,7 @@ def isHoliday(date):
 	else:
 		return False
 		
-def HolidayEvents(events):
+def HolidayEvents(events):#returns all events which are holidays
 	hEvents = []
 	for i in events:
 		if isHoliday(i):
@@ -105,16 +105,22 @@ def filterByTime(events,starth,endh):
 			list.append(i)
 	return list
 	
-def filterByWeekend(events):
+def filterByWeekend(events):#returns weekend events
 	list = []
 	for i in events:
 		if isWeekend(i):
 			list.append(i)
 	return list
+	
+def friendMatrix():
+	#np array = [[list],[list],[list]... etc. in loop ]]
 
 def isFriend(user1,user2):
 	events = filterByTime(filterByWeekend(matchBlueToothEvents(user1,user2)),1,23)#friday 1am to saturday 11pm
 	holidayEvents = matchBlueToothEvents(user1,user2)
+	
+	#numbers are based on number of scans which take place every 6 minutes for two people
+	
 	if (len(holidayEvents)>80 and numberOfUniqueDays(events)>=12 and len(events)>120):
 		return True
 	elif(numberOfUniqueDays(events)>=18 and len(events)>180):
