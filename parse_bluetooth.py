@@ -45,12 +45,6 @@ def matchBlueToothEvents(idd1, idd2): #returns bluetooth matches for user1->user
 	#events = events.sort()
 	return events
 	
-def printAllFriends(idd):
-	for i in range(1,len(idd[0])): #actually no need to go all the way through, only halfway since redundant
-		for j in range(1,len(idd[0])):
-			print "User:",i,"\t User:",j,"\t",isFriend(idd[0][i],idd[0][j])
-	
-	
 def isWeekend(d):
 	if d.isoweekday()==5 or d.isoweekday()==6 or d.isoweekday()==7:
 		return True
@@ -59,21 +53,6 @@ def isWeekend(d):
 def convertDatetime(dt):
    return datetime.fromordinal(int(dt)) + timedelta(days=dt%1) - timedelta(days=366) - timedelta(hours=5)
 
-def makeGraph(events): #nevermind this is not a useful function, but it might be interesting someday
-	x = []
-	for i in events:
-		if i not in X:
-			x.append(i)
-	y=[]
-	count = 0
-	for k in x:
-		for j in events:
-			if k==j:
-				count = count + 1
-	y.append(count)
-	count = 0
-	#plot
-	
 def numberOfUniqueDays(events):
 	return len({(i.day,i.month,i.year) for i in events})
 	
@@ -112,8 +91,14 @@ def filterByWeekend(events):#returns weekend events
 			list.append(i)
 	return list
 	
-def friendMatrix():
-	#np array = [[list],[list],[list]... etc. in loop ]]
+def friendMatrix(idd):
+	arr = np.zeros((90,90))
+	for i in range(1,len(idd[0])):
+		for j in range(1,len(idd[0])):
+			if(j>i):#upper triangular
+				arr[i][j]=isFriend(idd[0][i],idd[0][j])
+				print "i: ",i,"\t j: ",j
+	np.savetxt('friendMatrix.out',arr,delimiter=',')
 
 def isFriend(user1,user2):
 	events = filterByTime(filterByWeekend(matchBlueToothEvents(user1,user2)),1,23)#friday 1am to saturday 11pm
@@ -122,7 +107,7 @@ def isFriend(user1,user2):
 	#numbers are based on number of scans which take place every 6 minutes for two people
 	
 	if (len(holidayEvents)>80 and numberOfUniqueDays(events)>=12 and len(events)>120):
-		return True
+		return 1
 	elif(numberOfUniqueDays(events)>=18 and len(events)>180):
-		return True
-	else: return False
+		return 1
+	else: return 0
